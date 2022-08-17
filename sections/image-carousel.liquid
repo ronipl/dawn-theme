@@ -1,0 +1,111 @@
+<script src="https://cdn.jsdelivr.net/npm/siema@1.5.1/dist/siema.min.js" defer="defer"></script>
+
+<div class="nf-relative">
+    <div class="siema" data-duration="{{ section.settings.duration }}">
+      {% for block in section.blocks %}
+          {% if block.type == 'images' %}
+            <img 
+              class="xw-full" {{ block.shopify_attributes }}
+              src="{{ block.settings.image | image_url: width: 1600 }}"
+            >
+          {% endif %}
+        {% endfor %}
+    </div>
+  
+    <button class="prev nf-flex nf-items-center nf-absolute nf-h-full nf-top-0 nf-left-0 nf-z-10 nf-px-5 nf-group">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class=" group-hover:xopacity-100 bi bi-arrow-lefx circle-fill nf-w-20 nf-h-20 nf-text-white nf-opacity-60" viewBox="0 0 16 16">
+        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+      </svg>
+    </button>
+    <button class="next nf-flex nf-items-center nf-absolute nf-h-full nf-top-0 nf-right-0 nf-z-10 nf-px-5 nf-group">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="nf-w-20 nf-h-20 nf-text-white nf-opacity-60 group-hover:nf-opacity-100 bi bi-arrow-righx circle-fill" viewBox="0 0 16 16">
+        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+      </svg>
+    </button>
+  
+    <div class="nf-absolute nf-bottom-1/4 nf-mx-auto nf-left-0 nf-right-0 nf-xw-1/2 nf-z-20 nf-flex nf-flex-col nf-items-center nf-justify-center">
+      <div class="nf-font-bold nf-font-heading nf-text-4xl nf-text-white">
+        {{ section.settings.title }}
+      </div>
+      {% if section.settings.button_text %}
+        <a href="{{ section.settings.button_link }}" class=" nf-bg-white nf-px-12 nf-uppercase nf-mt-8 nf-py-6 nf-font-light">
+          {{ section.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+{% javascript %}
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('.siema').forEach(el => {
+    const duration = el.dataset.duration
+    const carousel = new Siema({
+      selector: el,
+      loop: true
+    })
+    
+    let interval = setInterval(() => carousel.next(), duration)
+    const parent = el.parentElement
+    
+    parent.querySelector('.prev').addEventListener('click', () => {
+      clearInterval(interval)
+      carousel.prev()
+      interval = setInterval(() => carousel.next(), duration)
+    });
+    parent.querySelector('.next').addEventListener('click', () => {
+      clearInterval(interval)
+      carousel.next()
+      interval = setInterval(() => carousel.next(), duration)
+    });
+  })
+});
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Image Carousel",
+  "tag": "section",
+  "class": "spaced-section spaced-section--full-width",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "number",
+      "id": "duration",
+      "label": "Loop interval",
+      "default": 6000
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Images",
+      "type": "images",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Carousel"
+    }
+  ]
+}
+{% endschema %}
